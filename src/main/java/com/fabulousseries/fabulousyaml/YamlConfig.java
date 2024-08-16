@@ -34,13 +34,9 @@ public class YamlConfig implements IYaml {
         map.put(keys[keys.length - 1], newValue);
     }
 
-    private void getDynamicKeysRecursive(Map<String, Object> map, List<String> keys) {
+    private void getDynamicKeysFirstLevel(Map<String, Object> map, List<String> keys) {
         for (String key : map.keySet()) {
             keys.add(key);
-            Object value = map.get(key);
-            if (value instanceof Map) {
-                getDynamicKeysRecursive((Map<String, Object>) value, keys);
-            }
         }
     }
 
@@ -49,7 +45,7 @@ public class YamlConfig implements IYaml {
         Object value = getValue(parentKey, Map.class);
         List<String> keys = new ArrayList<>();
         if (value instanceof Map) {
-            getDynamicKeysRecursive((Map<String, Object>) value, keys);
+            getDynamicKeysFirstLevel((Map<String, Object>) value, keys);
         }
         return keys;
     }
