@@ -2,11 +2,11 @@ package com.fabulousseries.fabulousyaml;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class YamlConfig implements IYaml {
     protected Map<String, Object> config;
-
     public YamlConfig(Map<String, Object> config) {
         this.config = config;
     }
@@ -34,6 +34,25 @@ public class YamlConfig implements IYaml {
         map.put(keys[keys.length - 1], newValue);
     }
 
+    private void getDynamicKeysRecursive(Map<String, Object> map, List<String> keys) {
+        for (String key : map.keySet()) {
+            keys.add(key);
+            Object value = map.get(key);
+            if (value instanceof Map) {
+                getDynamicKeysRecursive((Map<String, Object>) value, keys);
+            }
+        }
+    }
+
+    @Override
+    public List<String> getKeys(String parentKey) {
+        Object value = getValue(parentKey, Map.class);
+        List<String> keys = new ArrayList<>();
+        if (value instanceof Map) {
+            getDynamicKeysRecursive((Map<String, Object>) value, keys);
+        }
+        return keys;
+    }
     @Override
     public int getInt(String value) {
         return getValue(value, Integer.class);
@@ -55,10 +74,14 @@ public class YamlConfig implements IYaml {
     }
 
     @Override
-    public void setInt(String key, int value) {setValue(key, value);}
+    public void setInt(String key, int value) {
+        setValue(key, value);
+    }
 
     @Override
-    public void setBoolean(String key, boolean value) {setValue(key, value);}
+    public void setBoolean(String key, boolean value) {
+        setValue(key, value);
+    }
 
     @Override
     public void setString(String key, String value) {
